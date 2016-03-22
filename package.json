@@ -1,16 +1,17 @@
 {
   "private": true,
   "scripts": {
-    "test": "mocha test/* --harmony && npm run lint",
+    "test": "mocha test && npm run lint",
     "lint": "jscs ."
   },
   "devDependencies": {
-    "chai": "*",
-    "jscs": "^2.11.0",
-    "mocha": "*",
-    "sinon": "^1.17.3"
+    "chai": "~3.5.0",
+    "istanbul": "~0.4.2",
+    "jscs": "~2.11.0",
+    "mocha": "~2.4.5",
+    "sinon": "~1.17.3"
   },
   "dependencies": {
-    "bluebird": "^3.3.4"
+    "bluebird": "~3.3.4"
   }
 }
