@@ -1,7 +1,7 @@
 'use strict';
 
 const flow = require('../src/flow.js');
-const should = require('chai').should();
+const expect = require('chai').expect;
 const sinon = require('sinon');
 const join = require('path').join;
 const fs = require('fs');
@@ -39,41 +39,41 @@ describe('flow', function () {
     describe('.serial', function () {
         it('should return error, first arg is not an array', function (done) {
             flow.serial(func1, (err, res) => {
-                should.exist(err);
-                should.not.exist(res);
+                expect(err).to.exist;
+                expect(res).to.not.exist;
                 done();
             });
         });
 
         it('should return error, array is empty', function (done) {
             flow.serial([], (err, res) => {
-                should.exist(err);
-                should.not.exist(res);
+                expect(err).to.exist;
+                expect(res).to.not.exist;
                 done();
             });
         });
 
         it('should return error, one item of array is not a func', function (done) {
             flow.serial([func1, 59, func2], (err, res) => {
-                should.exist(err);
-                should.not.exist(res);
+                expect(err).to.exist;
+                expect(res).to.not.exist;
                 done();
             });
         });
 
         it('should return error, one of function is incorrect', function (done) {
             flow.serial([errFunc1, func2], (err, res) => {
-                should.exist(err);
-                should.not.exist(res);
+                expect(err).to.exist;
+                expect(res).to.not.exist;
                 done();
             });
         });
 
         it('should return string', function (done) {
             flow.serial([func1, func2], (err, res) => {
-                should.not.exist(err);
-                should.exist(res);
-                res.should.be.a('string');
+                expect(err).to.not.exist;
+                expect(res).to.exist;
+                expect(res).to.be.a('string');
                 done();
             });
         });
@@ -82,10 +82,10 @@ describe('flow', function () {
             let spy1 = sinon.spy(func1);
             let spy2 = sinon.spy(func2);
             flow.serial([spy1, spy2], (err, res) => {
-                should.not.exist(err);
-                spy1.calledBefore(spy2).should.be.true;
-                spy1.calledOnce.should.be.true;
-                spy2.calledOnce.should.be.true;
+                expect(err).to.not.exist;
+                expect(spy1.calledBefore(spy2)).to.be.true;
+                expect(spy1.calledOnce).to.be.true;
+                expect(spy2.calledOnce).to.be.true;
                 done();
             });
         });
@@ -94,57 +94,57 @@ describe('flow', function () {
     describe('.parallel', function () {
         it('should return error, first arg is not an array', function (done) {
             flow.parallel(func1, (err, res) => {
-                should.exist(err);
-                should.not.exist(res);
+                expect(err).to.exist;
+                expect(res).to.not.exist;
                 done();
             });
         });
 
         it('should return error, array is empty', function (done) {
             flow.parallel([], (err, res) => {
-                should.exist(err);
-                should.not.exist(res);
+                expect(err).to.exist;
+                expect(res).to.not.exist;
                 done();
             });
         });
 
         it('should return error, one item of array is not a func', function (done) {
             flow.parallel([func1, 59, func2], (err, res) => {
-                should.exist(err);
-                should.not.exist(res);
+                expect(err).to.exist;
+                expect(res).to.not.exist;
                 done();
             });
         });
 
         it('should return error, one of function is incorrect', function (done) {
             flow.parallel([func1, errFunc1], (err, res) => {
-                should.exist(err);
-                should.not.exist(res);
+                expect(err).to.exist;
+                expect(res).to.not.exist;
                 done();
             });
         });
 
         it('should return error, 2nd arg must be func or number', function (done) {
             flow.parallel([func1, func2], 'err', (err, res) => {
-                should.exist(err);
-                should.not.exist(res);
+                expect(err).to.exist;
+                expect(res).to.not.exist;
                 done();
             });
         });
 
         it('should return error, 2nd arg must be more than 0', function (done) {
             flow.parallel([func1, func2], 0, (err, res) => {
-                should.exist(err);
-                should.not.exist(res);
+                expect(err).to.exist;
+                expect(res).to.not.exist;
                 done();
             });
         });
 
         it('should return array with length 2', function (done) {
             flow.parallel([func1, func2], (err, res) => {
-                should.not.exist(err);
-                should.exist(res);
-                res.should.be.an('array').with.length(2);
+                expect(err).to.not.exist;
+                expect(res).to.exist;
+                expect(res).to.be.an('array').with.length(2);
                 done();
             });
         });
@@ -156,19 +156,19 @@ describe('flow', function () {
             flow.parallel([spy1, spy2], (err, res) => {
                 time = process.hrtime(time);
                 const timeExec = Math.round((time[0] + time[1] / 1e9) * 10) / 10;
-                should.not.exist(err);
-                spy1.calledOnce.should.be.true;
-                spy2.calledOnce.should.be.true;
-                timeExec.should.equal(1);
+                expect(err).to.not.exist;
+                expect(spy1.calledOnce).to.be.true;
+                expect(spy2.calledOnce).to.be.true;
+                expect(timeExec).to.equal(1);
                 done();
             });
         });
 
         it('should return array with length 3 (with limit)', function (done) {
             flow.parallel([func1, func2, func3], 1, (err, res) => {
-                should.not.exist(err);
-                should.exist(res);
-                res.should.be.an('array').with.length(3);
+                expect(err).to.not.exist;
+                expect(res).to.exist;
+                expect(res).to.be.an('array').with.length(3);
                 done();
             });
         });
@@ -183,11 +183,11 @@ describe('flow', function () {
             flow.parallel([spy1, spy2, spy3], 1, (err, res) => {
                 time = process.hrtime(time);
                 const timeExec = Math.round((time[0] + time[1] / 1e9) * 10) / 10;
-                should.not.exist(err);
-                spy1.calledOnce.should.be.true;
-                spy2.calledOnce.should.be.true;
-                spy3.calledOnce.should.be.true;
-                timeExec.should.equal(3);
+                expect(err).to.not.exist;
+                expect(spy1.calledOnce).to.be.true;
+                expect(spy2.calledOnce).to.be.true;
+                expect(spy3.calledOnce).to.be.true;
+                expect(timeExec).to.equal(3);
                 done();
             });
         });
@@ -199,33 +199,33 @@ describe('flow', function () {
 
         it('should return error, 1st arg is not an array', function (done) {
             flow.map('string', func1, (err, res) => {
-                should.exist(err);
-                should.not.exist(res);
+                expect(err).to.exist;
+                expect(res).to.not.exist;
                 done();
             });
         });
 
         it('should return error, array is empty', function (done) {
             flow.map([], func1, (err, res) => {
-                should.exist(err);
-                should.not.exist(res);
+                expect(err).to.exist;
+                expect(res).to.not.exist;
                 done();
             });
         });
 
         it('should return error, 2nd arg is not a function', function (done) {
             flow.map(files, 13, (err, res) => {
-                should.exist(err);
-                should.not.exist(res);
+                expect(err).to.exist;
+                expect(res).to.not.exist;
                 done();
             });
         });
 
         it('should return array', function (done) {
             flow.map(files, fs.stat, (err, res) => {
-                should.not.exist(err);
-                should.exist(res);
-                res.should.be.an('array');
+                expect(err).to.not.exist;
+                expect(res).to.exist;
+                expect(res).to.be.an('array');
                 done();
             });
         });
@@ -233,10 +233,10 @@ describe('flow', function () {
         it('should called function with each value', function (done) {
             let spy = sinon.spy(fs.stat);
             flow.map(files, spy, (err, res) => {
-                should.not.exist(err);
-                spy.callCount.should.equal(files.length);
+                expect(err).to.not.exist;
+                expect(spy.callCount).to.equal(files.length);
                 files.forEach((item, i) => {
-                    spy.getCall(i).args[0].should.be.equal(item);
+                    expect(spy.getCall(i).args[0]).to.equal(item);
                 });
                 done();
             });
@@ -249,8 +249,8 @@ describe('flow', function () {
             flow.map(files, spy, (err, res) => {
                 time = process.hrtime(time);
                 const timeExec = Math.round((time[0] + time[1] / 1e9) * 10) / 10;
-                should.not.exist(err);
-                timeExec.should.equal(1);
+                expect(err).to.not.exist;
+                expect(timeExec).to.equal(1);
                 done();
             });
         });
@@ -263,15 +263,15 @@ describe('flow', function () {
 
         it('should return error, 1st arg is not a function', function () {
             const errConcat = flow.makeAsync({});
-            errConcat.should.be.an('error');
+            expect(errConcat).to.be.an('error');
         });
 
         it('should return string', function (done) {
             concat = flow.makeAsync(concat);
             concat('ololo', 15, (err, res) => {
-                should.not.exist(err);
-                should.exist(res);
-                res.should.be.a('string');
+                expect(err).to.not.exist;
+                expect(res).to.exist;
+                expect(res).to.be.a('string');
                 done();
             });
         });
