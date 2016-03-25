@@ -65,15 +65,12 @@ exports.parallel = function (funcArr, limit, callback) {
                 if (countRunningFuncs < limit) {
                     countRunningFuncs++;
                     func((err, data) => {
-                        let timer = func.isSinonProxy ? 1000 : 0;
-                        setTimeout(() => {
-                            countRunningFuncs--;
-                            err ? reject(err) : resolve(data);
-                        }, timer);
+                        countRunningFuncs--;
+                        err ? reject(err) : resolve(data);
                     });
                     clearInterval(timer);
                 }
-            }, 0);
+            }, 10);
         });
     }
 
@@ -91,10 +88,7 @@ exports.map = function (valueArr, func, callback) {
     function getPromise(value) {
         return new Promise((resolve, reject) => {
             func(value, (err, data) => {
-                let timer = func.isSinonProxy ? 1000 : 0;
-                setTimeout(() => {
-                    err ? reject(err) : resolve(data);
-                }, timer);
+                err ? reject(err) : resolve(data);
             });
         });
     }

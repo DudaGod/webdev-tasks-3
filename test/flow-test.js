@@ -28,6 +28,18 @@ function func3(next) {
     });
 }
 
+function stubTimeout(callback) {
+    setTimeout(() => {
+        callback(null, 1);
+    }, 10000);
+}
+
+function stubTimeout2(value, callback) {
+    setTimeout(() => {
+        callback(null, value);
+    }, 10000);
+}
+
 function errFunc1(next) {
     fs.readdir(join(__dirname, '..', 'slowpok'), (err, files) => {
         next(err, files);
@@ -150,18 +162,15 @@ describe('flow', function () {
         });
 
         it('should called functions in parallel (test on time execution)', function (done) {
-            let spy1 = sinon.spy(func1);
-            let spy2 = sinon.spy(func2);
-            let time = process.hrtime();
-            flow.parallel([spy1, spy2], (err, res) => {
-                time = process.hrtime(time);
-                const timeExec = Math.round((time[0] + time[1] / 1e9) * 10) / 10;
-                expect(err).to.not.exist;
-                expect(spy1.calledOnce).to.be.true;
-                expect(spy2.calledOnce).to.be.true;
-                expect(timeExec).to.equal(1);
-                done();
-            });
+            let spy = sinon.spy(stubTimeout);
+            let clock = sinon.useFakeTimers();
+
+            flow.parallel([spy, spy], (err, res) => {});
+
+            clock.tick(10000);
+            expect(spy.callCount).to.equal(2);
+            clock.restore();
+            done();
         });
 
         it('should return array with length 3 (with limit)', function (done) {
@@ -175,21 +184,19 @@ describe('flow', function () {
 
         it('should called functions one by one with limit = 1 ' +
             '(test on time execution)', function (done) {
-            this.timeout(4000);
-            let spy1 = sinon.spy(func1);
-            let spy2 = sinon.spy(func2);
-            let spy3 = sinon.spy(func3);
-            let time = process.hrtime();
-            flow.parallel([spy1, spy2, spy3], 1, (err, res) => {
-                time = process.hrtime(time);
-                const timeExec = Math.round((time[0] + time[1] / 1e9) * 10) / 10;
-                expect(err).to.not.exist;
-                expect(spy1.calledOnce).to.be.true;
-                expect(spy2.calledOnce).to.be.true;
-                expect(spy3.calledOnce).to.be.true;
-                expect(timeExec).to.equal(3);
-                done();
-            });
+            let spy = sinon.spy(stubTimeout);
+            let clock = sinon.useFakeTimers();
+
+            flow.parallel([spy, spy, spy], 1, (err, res) => {});
+
+            clock.tick(10000);
+            expect(spy.callCount).to.equal(1);
+            clock.tick(10000);
+            expect(spy.callCount).to.equal(2);
+            clock.tick(10000);
+            expect(spy.callCount).to.equal(3);
+            clock.restore();
+            done();
         });
     });
 
@@ -244,15 +251,15 @@ describe('flow', function () {
 
         it('should called function with all values in parallel ' +
             '(test on time execution)', function (done) {
-            let spy = sinon.spy(fs.stat);
-            let time = process.hrtime();
-            flow.map(files, spy, (err, res) => {
-                time = process.hrtime(time);
-                const timeExec = Math.round((time[0] + time[1] / 1e9) * 10) / 10;
-                expect(err).to.not.exist;
-                expect(timeExec).to.equal(1);
-                done();
-            });
+            let spy = sinon.spy(stubTimeout2);
+            let clock = sinon.useFakeTimers();
+
+            flow.map(files, spy, (err, res) => {});
+
+            clock.tick(10000);
+            clock.restore();
+            expect(spy.callCount).to.equal(files.length);
+            done();
         });
     });
 
